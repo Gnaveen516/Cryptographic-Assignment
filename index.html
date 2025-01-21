@@ -1,0 +1,96 @@
+<html>
+<head>
+    <title>Hex to ASCII and Unknown Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-roboto">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-6">Hex to ASCII and Unknown Converter</h1>
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="mb-4">
+                <label for="hexInput" class="block text-gray-700 font-bold mb-2">Hex Input:</label>
+                <textarea id="hexInput" class="w-full p-2 border border-gray-300 rounded" rows="4" placeholder="Enter hex values separated by spaces"></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="asciiOutput" class="block text-gray-700 font-bold mb-2">ASCII Output (JSON):</label>
+                <textarea id="asciiOutput" class="w-full p-2 border border-gray-300 rounded" rows="4" placeholder="ASCII output will appear here" readonly></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="unknownOutput" class="block text-gray-700 font-bold mb-2">Unknown Output:</label>
+                <textarea id="unknownOutput" class="w-full p-2 border border-gray-300 rounded" rows="4" placeholder="Unknown output will appear here" readonly></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="unknownInput" class="block text-gray-700 font-bold mb-2">Unknown Input:</label>
+                <textarea id="unknownInput" class="w-full p-2 border border-gray-300 rounded" rows="4" placeholder="Enter unknown string"></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="hexOutput" class="block text-gray-700 font-bold mb-2">Hex Output:</label>
+                <textarea id="hexOutput" class="w-full p-2 border border-gray-300 rounded" rows="4" placeholder="Hex output will appear here" readonly></textarea>
+            </div>
+            <div class="flex justify-between">
+                <button id="convertToUnknownButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Convert to Unknown</button>
+                <button id="convertToHexButton" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">Convert to Hex</button>
+                <button id="clearButton" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function hexToAscii(hex) {
+            let ascii = '';
+            hex.split(' ').forEach(h => {
+                if (h) {
+                    ascii += String.fromCharCode(parseInt(h, 16));
+                }
+            });
+            return ascii;
+        }
+
+        function encodeUnknown(hex) {
+            let unknown = '';
+            for (let i = 0; i < hex.length; i += 32) {
+                let chunk = hex.substring(i, i + 32);
+                unknown += btoa(chunk);
+            }
+            return unknown;
+        }
+
+        function decodeUnknown(unknown) {
+            let hex = '';
+            for (let i = 0; i < unknown.length; i += 44) { // 32 hex characters encoded to base64 results in 44 characters
+                let chunk = unknown.substring(i, i + 44);
+                hex += atob(chunk);
+            }
+            return hex;
+        }
+
+        document.getElementById('convertToUnknownButton').addEventListener('click', function() {
+            const hexInput = document.getElementById('hexInput').value.trim();
+            const asciiOutput = hexToAscii(hexInput);
+            const unknownOutput = encodeUnknown(hexInput);
+
+            document.getElementById('asciiOutput').value = JSON.stringify({ ascii_text: asciiOutput }, null, 2);
+            document.getElementById('unknownOutput').value = unknownOutput;
+        });
+
+        document.getElementById('convertToHexButton').addEventListener('click', function() {
+            const unknownInput = document.getElementById('unknownInput').value.trim();
+            const hexOutput = decodeUnknown(unknownInput);
+            const asciiOutput = hexToAscii(hexOutput);
+
+            document.getElementById('hexOutput').value = hexOutput;
+            document.getElementById('asciiOutput').value = JSON.stringify({ ascii_text: asciiOutput }, null, 2);
+        });
+
+        document.getElementById('clearButton').addEventListener('click', function() {
+            document.getElementById('hexInput').value = '';
+            document.getElementById('asciiOutput').value = '';
+            document.getElementById('unknownOutput').value = '';
+            document.getElementById('unknownInput').value = '';
+            document.getElementById('hexOutput').value = '';
+        });
+    </script>
+</body>
+</html>
